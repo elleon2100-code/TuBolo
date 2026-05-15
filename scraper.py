@@ -2,7 +2,9 @@ import os
 import requests
 from bs4 import BeautifulSoup
 from supabase import create_client, Client
+from dotenv import load_dotenv  
 
+load_dotenv()  
 # === CONFIGURACIÓN DE SUPABASE ===
 # Leemos las credenciales desde las variables de entorno para no exponerlas
 SUPABASE_URL = os.environ.get("SUPABASE_URL")
