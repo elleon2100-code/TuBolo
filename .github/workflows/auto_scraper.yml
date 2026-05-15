@@ -2,26 +2,24 @@ name: TuBolo Auto Scraper
 
 on:
   schedule:
-    # Se ejecuta a las 1:15 PM, 3:15 PM, 7:15 PM y 9:15 PM (Hora RD aprox)
-    # Nota: GitHub usa UTC, RD es UTC-4.
     - cron: '15 17,19,23,1 * * *'
-  workflow_dispatch: # Permite ejecutarlo manualmente desde GitHub
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout código
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Configurar Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
       - name: Instalar dependencias
         run: |
-          pip install requests beautifulsoup4 supabase
+          pip install requests beautifulsoup4 supabase python-dotenv
 
       - name: Ejecutar Scraper
         env:
