@@ -5,8 +5,22 @@ import LotteryCard, { LotteryResult } from "@/components/LotteryCard";
 import AdBanner from "@/components/AdBanner";
 import { supabase } from "@/lib/supabase";
 
-const loteriasFiltro = ["Todas", "Lotería Nacional", "LEIDSA", "Real", "Primera", "Suerte", "King Lottery"];
+// Lista actualizada con los nombres exactos del scraper
+const loteriasFiltro = [
+  "Todas", 
+  "Nacional", 
+  "Leidsa", 
+  "Loteria Real", 
+  "La Primera", 
+  "La Suerte", 
+  "Loteka", 
+  "LoteDom", 
+  "Anguila", 
+  "Americanas", 
+  "King Lottery"
+];
 
+// Asignación de colores para las nuevas categorías
 const getCategoria = (loteria: string): any => {
   const l = loteria.toLowerCase();
   if (l.includes("nacional")) return "nacional";
@@ -14,13 +28,17 @@ const getCategoria = (loteria: string): any => {
   if (l.includes("real")) return "real";
   if (l.includes("primera")) return "primera";
   if (l.includes("suerte")) return "suerte";
+  if (l.includes("loteka")) return "quiniela";
+  if (l.includes("lotedom")) return "suerte";
+  if (l.includes("anguila")) return "primera";
+  if (l.includes("americanas")) return "nacional";
   return "quiniela";
 };
 
 export default function Home() {
   const [search, setSearch] = useState("");
   const [filtro, setFiltro] = useState("Todas");
-  const [fechaHistorial, setFechaHistorial] = useState(""); // Estado para el historial
+  const [fechaHistorial, setFechaHistorial] = useState(""); 
   const [resultados, setResultados] = useState<LotteryResult[]>([]);
   const [cargando, setCargando] = useState(true);
 
@@ -30,36 +48,42 @@ export default function Home() {
     async function fetchSorteos() {
       setCargando(true);
       
-      // Base de la consulta
       let query = supabase.from('sorteos_resultados').select('*').order('fecha', { ascending: false });
       
-      // Si hay una fecha seleccionada, filtramos por ese día exacto
       if (fechaHistorial) {
         query = query.eq('fecha', fechaHistorial);
       } else {
-        query = query.limit(40); // Si no hay fecha, traemos los más recientes
+        query = query.limit(40); 
       }
 
       const { data, error } = await query;
       
       if (data) {
-        const formattedData: LotteryResult[] = data.map((item, index) => ({
-          id: item.id || index,
-          loteria: item.loteria,
-          sorteo: item.sorteo,
-          premios: [item.primer_premio, item.segundo_premio, item.tercer_premio],
-          fecha: item.fecha,
-          categoria: getCategoria(item.loteria)
-        }));
+        const formattedData: LotteryResult[] = data.map((item, index) => {
+          let premiosExtraidos = item.premios_arreglo;
+          if (!premiosExtraidos || premiosExtraidos.length === 0) {
+            premiosExtraidos = [item.primer_premio, item.segundo_premio, item.tercer_premio].filter(Boolean);
+          }
+
+          return {
+            id: item.id || index,
+            loteria: item.loteria,
+            sorteo: item.sorteo,
+            premios: premiosExtraidos,
+            fecha: item.fecha,
+            categoria: getCategoria(item.loteria)
+          };
+        });
         setResultados(formattedData);
       }
       setCargando(false);
     }
     fetchSorteos();
-  }, [fechaHistorial]); // Re-ejecuta la consulta cuando cambia la fecha
+  }, [fechaHistorial]);
 
   const filtered = resultados.filter((r) => {
-    const matchFiltro = filtro === "Todas" || r.loteria === filtro;
+    // Comparación segura: minúsculas y sin espacios extra
+    const matchFiltro = filtro === "Todas" || r.loteria.toLowerCase().trim() === filtro.toLowerCase().trim();
     const matchSearch = r.sorteo.toLowerCase().includes(search.toLowerCase()) || r.loteria.toLowerCase().includes(search.toLowerCase());
     return matchFiltro && matchSearch;
   });
@@ -81,7 +105,6 @@ export default function Home() {
             <span className="text-[11px] text-gray-400 capitalize hidden sm:block">{today}</span>
           </div>
           <div className="flex items-center gap-2 w-full sm:max-w-md">
-            {/* Selector de Historial */}
             <input 
               type="date" 
               value={fechaHistorial}
@@ -89,7 +112,6 @@ export default function Home() {
               className="px-3 py-2 text-sm rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 text-gray-600"
               title="Ver resultados anteriores"
             />
-            {/* Buscador */}
             <div className="relative w-full">
               <input type="search" placeholder="Buscar sorteo…" value={search} onChange={(e) => setSearch(e.target.value)} className="w-full pl-4 pr-4 py-2 text-sm rounded-xl border border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 transition placeholder:text-gray-400" />
             </div>

@@ -5,7 +5,7 @@ export interface LotteryResult {
   id: number;
   loteria: string;
   sorteo: string;
-  premios: number[];
+  premios: number[] | string[];
   fecha: string;
   hora?: string;
   categoria?: "nacional" | "quiniela" | "leidsa" | "real" | "primera" | "suerte";
@@ -21,6 +21,9 @@ interface LotteryCardProps { data: LotteryResult; index?: number; }
 
 export default function LotteryCard({ data, index = 0 }: LotteryCardProps) {
   const accent = data.categoria ? accentMap[data.categoria] : defaultAccent;
+  const isStandard = data.premios.length === 3;
+  const isCompact = data.premios.length > 5;
+
   return (
     <motion.article
       initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}
@@ -40,15 +43,26 @@ export default function LotteryCard({ data, index = 0 }: LotteryCardProps) {
         </div>
       </div>
       <div className="h-px bg-gray-100" />
-      <div className="flex items-center justify-center gap-3">
-        {data.premios.map((num, i) => (
-          <motion.div key={i} initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: index * 0.07 + i * 0.06 + 0.15, duration: 0.3, ease: "backOut" }} className="flex flex-col items-center gap-1.5">
-            <span className="text-[9px] font-bold tracking-widest uppercase text-gray-400">{i === 0 ? "1er" : i === 1 ? "2do" : "3er"}</span>
-            <div className="w-14 h-14 rounded-xl flex items-center justify-center text-2xl font-black tabular-nums" style={{ background: i === 0 ? `linear-gradient(135deg, ${accent}, ${accent}cc)` : i === 1 ? `${accent}12` : `${accent}08`, color: i === 0 ? "#fff" : accent, boxShadow: i === 0 ? `0 4px 14px ${accent}40` : "none" }}>
-              {String(num).padStart(2, "0")}
-            </div>
-          </motion.div>
-        ))}
+      
+      {/* Contenedor dinámico para los bolos */}
+      <div className={`flex flex-wrap items-center justify-center gap-2 ${isCompact ? 'mt-2' : ''}`}>
+        {data.premios.map((num, i) => {
+          // Lógica de etiquetas: solo mostramos 1er, 2do, 3er si es un sorteo estándar de 3 premios
+          const label = isStandard ? (i === 0 ? "1er" : i === 1 ? "2do" : "3er") : null;
+          // Si hay muchos bolos, los hacemos más pequeños
+          const ballClasses = isCompact 
+            ? "w-9 h-9 text-sm rounded-lg" 
+            : "w-14 h-14 text-2xl rounded-xl";
+
+          return (
+            <motion.div key={i} initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: index * 0.07 + i * 0.03 + 0.15, duration: 0.3, ease: "backOut" }} className="flex flex-col items-center gap-1.5">
+              {label && <span className="text-[9px] font-bold tracking-widest uppercase text-gray-400">{label}</span>}
+              <div className={`${ballClasses} flex items-center justify-center font-black tabular-nums`} style={{ background: i === 0 && isStandard ? `linear-gradient(135deg, ${accent}, ${accent}cc)` : i === 1 && isStandard ? `${accent}12` : `${accent}08`, color: i === 0 && isStandard ? "#fff" : accent, boxShadow: i === 0 && isStandard ? `0 4px 14px ${accent}40` : "none" }}>
+                {String(num).padStart(2, "0")}
+              </div>
+            </motion.div>
+          );
+        })}
       </div>
     </motion.article>
   );
