@@ -107,6 +107,11 @@ export default function Home() {
           </div>
           <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
             
+            {/* ENLACE AL BLOG / NOTICIAS */}
+            <a href="/articulos" className="hidden sm:flex items-center gap-1.5 px-3 py-2 text-sm font-bold text-gray-500 hover:text-blue-600 transition-colors whitespace-nowrap">
+              📰 Noticias
+            </a>
+
             {/* MENÚ DESPLEGABLE MAESTRO DE HERRAMIENTAS */}
             <div className="relative">
               <button 
@@ -119,9 +124,7 @@ export default function Home() {
               <AnimatePresence>
                 {menuAbierto && (
                   <>
-                    {/* Fondo invisible para cerrar al hacer clic fuera */}
                     <div className="fixed inset-0 z-40" onClick={() => setMenuAbierto(false)} />
-                    
                     <motion.div 
                       initial={{ opacity: 0, scale: 0.95, y: 10 }}
                       animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -148,6 +151,11 @@ export default function Home() {
                       <a href="/herramientas/simulador" className="flex items-center gap-2.5 px-4 py-2.5 text-sm font-bold text-gray-600 hover:text-blue-600 hover:bg-blue-50/50 transition-colors">
                         <span>🎰</span> Simulador de Sorteos
                       </a>
+                      <div className="border-t border-gray-50 mt-1 sm:hidden">
+                         <a href="/articulos" className="flex items-center gap-2.5 px-4 py-2.5 text-sm font-bold text-gray-600 hover:text-blue-600 hover:bg-blue-50/50 transition-colors">
+                          <span>📰</span> Noticias y Estrategias
+                        </a>
+                      </div>
                     </motion.div>
                   </>
                 )}
