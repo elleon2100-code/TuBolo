@@ -2,6 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { Metadata } from 'next';
+import DOMPurify from 'isomorphic-dompurify'; // Sanitizador seguro para Server Components
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
@@ -13,7 +14,6 @@ type Props = {
   params: Promise<{ slug: string }>;
 };
 
-// 1. GENERACIÓN DINÁMICA DE SEO CON AWAIT PARAMS
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const resolvedParams = await params;
   
@@ -36,7 +36,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-// 2. COMPONENTE PRINCIPAL CON AWAIT PARAMS
 export default async function ArticuloDetalle({ params }: Props) {
   const resolvedParams = await params;
 
@@ -46,10 +45,15 @@ export default async function ArticuloDetalle({ params }: Props) {
     .eq('slug', resolvedParams.slug)
     .single();
 
-  // Si no existe el artículo, lanzamos 404 real
   if (!articulo) {
     notFound();
   }
+
+  // LINEA DE DEFENSA CRÍTICA: Sanitización estricta del HTML en el servidor
+  const contenidoSanitizado = DOMPurify.sanitize(articulo.contenido, {
+    ALLOWED_TAGS: ['p', 'b', 'i', 'em', 'strong', 'h1', 'h2', 'h3', 'ul', 'ol', 'li', 'span', 'br'],
+    ALLOWED_ATTR: ['class', 'id']
+  });
 
   const fechaFormateada = new Date(articulo.created_at).toLocaleDateString('es-DO', {
     year: 'numeric',
@@ -61,7 +65,7 @@ export default async function ArticuloDetalle({ params }: Props) {
     <div className="min-h-screen bg-white text-gray-900 font-sans pb-20">
       <header className="bg-white/90 backdrop-blur-md border-b border-gray-100 sticky top-0 z-40">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/articulos" className="flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-blue-600 transition-colors">
+          <Link href="/articulos" className="inline-flex min-h-12 items-center gap-2 text-sm font-semibold text-gray-500 hover:text-blue-600 transition-colors">
             ← Volver a Noticias
           </Link>
         </div>
@@ -87,16 +91,18 @@ export default async function ArticuloDetalle({ params }: Props) {
           </div>
         )}
 
+        {/* CLASES DEFENSIVAS DE NAVEGACIÓN: Evitan desbordamiento u overflow en pantallas móviles */}
         <article 
-          className="prose prose-lg sm:prose-xl prose-blue max-w-none text-gray-600 leading-relaxed
+          className="prose prose-lg sm:prose-xl prose-blue max-w-none text-gray-600 leading-relaxed max-w-none overflow-hidden break-words
                      prose-headings:font-black prose-headings:text-gray-900 prose-headings:tracking-tight
-                     prose-p:mb-6"
-          dangerouslySetInnerHTML={{ __html: articulo.contenido }}
+                     prose-p:mb-6 prose-table:block prose-table:w-full prose-table:overflow-x-auto
+                     prose-pre:overflow-x-auto prose-img:max-w-full prose-a:break-words"
+          dangerouslySetInnerHTML={{ __html: contenidoSanitizado }}
         />
 
         <div className="mt-16 pt-10 border-t border-gray-100 text-center">
           <p className="text-gray-500 font-medium mb-6">¿Inspirado por este artículo?</p>
-          <Link href="/herramientas/simulador" className="inline-flex items-center justify-center px-8 py-4 bg-blue-600 text-white font-black rounded-2xl hover:bg-blue-700 transition-colors shadow-md shadow-blue-500/30">
+          <Link href="/herramientas/simulador" className="inline-flex min-h-12 items-center justify-center px-8 py-4 bg-blue-600 text-white font-black rounded-2xl hover:bg-blue-700 transition-colors shadow-md shadow-blue-500/30">
             🎰 Pon a prueba tus números en el Simulador
           </Link>
         </div>
