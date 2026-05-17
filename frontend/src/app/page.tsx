@@ -41,6 +41,7 @@ export default function Home() {
   const [fechaHistorial, setFechaHistorial] = useState(""); 
   const [resultados, setResultados] = useState<LotteryResult[]>([]);
   const [cargando, setCargando] = useState(true);
+  const [menuAbierto, setMenuAbierto] = useState(false);
 
   const today = new Date().toLocaleDateString("es-DO", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
 
@@ -102,18 +103,66 @@ export default function Home() {
               </div>
               <span className="text-xl font-black tracking-tight text-gray-900">Tu<span className="text-blue-600">Bolo</span></span>
             </a>
-            <span className="text-[11px] text-gray-400 capitalize hidden sm:block">{today}</span>
+            <span className="text-[11px] text-gray-400 capitalize hidden md:block">{today}</span>
           </div>
-          <div className="flex items-center gap-2 w-full sm:max-w-md">
+          <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+            
+            {/* MENÚ DESPLEGABLE MAESTRO DE HERRAMIENTAS */}
+            <div className="relative">
+              <button 
+                onClick={() => setMenuAbierto(!menuAbierto)}
+                className="flex items-center gap-1.5 px-3 py-2 text-sm font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-xl transition-colors whitespace-nowrap"
+              >
+                🎲 Utilities <span className="text-[10px] transition-transform duration-200" style={{ transform: menuAbierto ? 'rotate(180deg)' : 'rotate(0deg)' }}>▼</span>
+              </button>
+
+              <AnimatePresence>
+                {menuAbierto && (
+                  <>
+                    {/* Fondo invisible para cerrar al hacer clic fuera */}
+                    <div className="fixed inset-0 z-40" onClick={() => setMenuAbierto(false)} />
+                    
+                    <motion.div 
+                      initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute right-0 mt-2 w-56 bg-white border border-gray-100 rounded-2xl shadow-xl py-2 z-50 overflow-hidden"
+                    >
+                      <p className="px-4 py-1.5 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-50 mb-1">Herramientas</p>
+                      <a href="/herramientas/generador" className="flex items-center gap-2.5 px-4 py-2.5 text-sm font-bold text-gray-600 hover:text-blue-600 hover:bg-blue-50/50 transition-colors">
+                        <span>🎲</span> Generador de la Suerte
+                      </a>
+                      <a href="/herramientas/piramide" className="flex items-center gap-2.5 px-4 py-2.5 text-sm font-bold text-gray-600 hover:text-blue-600 hover:bg-blue-50/50 transition-colors">
+                        <span>🔺</span> La Pirámide Numérica
+                      </a>
+                      <a href="/herramientas/suenos" className="flex items-center gap-2.5 px-4 py-2.5 text-sm font-bold text-gray-600 hover:text-blue-600 hover:bg-blue-50/50 transition-colors">
+                        <span>☁️</span> Diccionario de Sueños
+                      </a>
+                      <a href="/herramientas/jaladora" className="flex items-center gap-2.5 px-4 py-2.5 text-sm font-bold text-gray-600 hover:text-blue-600 hover:bg-blue-50/50 transition-colors">
+                        <span>🧲</span> La Tabla Jaladora
+                      </a>
+                      <a href="/herramientas/termometro" className="flex items-center gap-2.5 px-4 py-2.5 text-sm font-bold text-gray-600 hover:text-blue-600 hover:bg-blue-50/50 transition-colors">
+                        <span>🔥</span> Termómetro de Bolos
+                      </a>
+                      <a href="/herramientas/simulador" className="flex items-center gap-2.5 px-4 py-2.5 text-sm font-bold text-gray-600 hover:text-blue-600 hover:bg-blue-50/50 transition-colors">
+                        <span>🎰</span> Simulador de Sorteos
+                      </a>
+                    </motion.div>
+                  </>
+                )}
+              </AnimatePresence>
+            </div>
+            
             <input 
               type="date" 
               value={fechaHistorial}
               onChange={(e) => setFechaHistorial(e.target.value)}
-              className="px-3 py-2 text-sm rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 text-gray-600"
+              className="px-3 py-2 text-sm rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 text-gray-600 shrink-0"
               title="Ver resultados anteriores"
             />
-            <div className="relative w-full">
-              <input type="search" placeholder="Buscar sorteo…" value={search} onChange={(e) => setSearch(e.target.value)} className="w-full pl-4 pr-4 py-2 text-sm rounded-xl border border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 transition placeholder:text-gray-400" />
+            <div className="relative w-full sm:max-w-[180px]">
+              <input type="search" placeholder="Buscar..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full pl-3 pr-3 py-2 text-sm rounded-xl border border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 transition placeholder:text-gray-400" />
             </div>
           </div>
         </div>
