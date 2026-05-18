@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function Footer() {
   return (
@@ -6,12 +7,15 @@ export default function Footer() {
       <div className="max-w-6xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
         {/* Columna Branding */}
         <div className="space-y-4">
-          <div className="flex items-center gap-2 select-none">
-            <div className="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center">
-              <span className="text-white font-black text-xs">TB</span>
-            </div>
-            <span className="text-lg font-black tracking-tight text-gray-900">Tu<span className="text-blue-600">Bolo</span></span>
-          </div>
+          <Link href="/" className="inline-flex items-center gap-2 select-none">
+            <Image 
+              src="/logo.png" 
+              alt="TuBolo Logo" 
+              width={120} 
+              height={35} 
+              className="object-contain h-auto w-auto max-h-[35px] opacity-90 hover:opacity-100 transition-opacity"
+            />
+          </Link>
           <p className="text-sm leading-relaxed max-w-xs text-gray-400">
             Estadísticas, utilidades de entretenimiento y análisis de loterías dominicanas de forma analítica y responsable.
           </p>

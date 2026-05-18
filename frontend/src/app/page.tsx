@@ -1,6 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
+import Link from "next/link";
 import LotteryCard, { LotteryResult } from "@/components/LotteryCard";
 import AdBanner from "@/components/AdBanner";
 import { supabase } from "@/lib/supabase";
@@ -95,14 +97,18 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-[#f8f9fb] text-gray-900 font-sans">
       <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-gray-100">
-        <div className="max-w-6xl mx-auto px-4 py-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="max-w-6xl mx-auto px-4 py-2 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center justify-between sm:justify-start gap-4">
-            <a href="/" className="flex items-center gap-2 select-none">
-              <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
-                <span className="text-white font-black text-sm">TB</span>
-              </div>
-              <span className="text-xl font-black tracking-tight text-gray-900">Tu<span className="text-blue-600">Bolo</span></span>
-            </a>
+            <Link href="/" className="flex items-center gap-2">
+              <Image 
+                src="/logo.png" 
+                alt="TuBolo Logo" 
+                width={300} 
+                height={100} 
+                className="object-contain min-w-[180px] h-auto max-h-[80px]"
+                priority 
+              />
+            </Link>
             <span className="text-[11px] text-gray-400 capitalize hidden md:block">{today}</span>
           </div>
           <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
@@ -130,7 +136,7 @@ export default function Home() {
                       animate={{ opacity: 1, scale: 1, y: 0 }}
                       exit={{ opacity: 0, scale: 0.95, y: 10 }}
                       transition={{ duration: 0.15 }}
-                      className="absolute right-0 mt-2 w-56 bg-white border border-gray-100 rounded-2xl shadow-xl py-2 z-50 overflow-hidden"
+                      className="absolute left-0 sm:left-auto sm:right-0 mt-2 w-56 max-w-[90vw] bg-white border border-gray-100 rounded-2xl shadow-xl py-2 z-50 overflow-hidden origin-top-left sm:origin-top-right"
                     >
                       <p className="px-4 py-1.5 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-50 mb-1">Herramientas</p>
                       <a href="/herramientas/generador" className="flex items-center gap-2.5 px-4 py-2.5 text-sm font-bold text-gray-600 hover:text-blue-600 hover:bg-blue-50/50 transition-colors">
